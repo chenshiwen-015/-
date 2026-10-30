@@ -1,0 +1,5 @@
+Optional AI segmentation: @imgly/background-removal 1.7.0 by IMG.LY.
+Source: https://github.com/imgly/background-removal-js
+License: GNU Affero General Public License v3.0 (AGPL-3.0).
+The linked source.zip contains the editor's complete corresponding source, notices, and setup instructions. The AI library and its own runtime/model assets are loaded on demand from esm.sh and IMG.LY's documented asset service, and retain their respective upstream notices and licenses.
+This editor's code is distributed under AGPL-3.0. User-uploaded photos and generated backgrounds are not re-licensed as software by this notice.

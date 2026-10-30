@@ -1,0 +1,35 @@
+/* Template-specific content and independent copy/background drafts. */
+(function(root){
+'use strict';
+const common=new Set(['brand','product','year']);
+const fields={
+ brand:{label:'品牌 / 标识',max:40},product:{label:'商品名称 / 款号',type:'textarea',max:120},year:{label:'年份',max:8},
+ masthead:{label:'左上角大字',max:8},season:{label:'季节 / 系列',type:'textarea',max:50},scriptTitle:{label:'手写装饰文字',max:35},note:{label:'左栏氛围文案',type:'textarea',max:60},
+ headline:{label:'主标题（回车换行）',type:'textarea',max:60},subtitle:{label:'副标题 / 卖点',max:90},features:{label:'卖点标签（每行一项，最多四项）',type:'textarea',max:120},
+ caption1:{label:'拍立得一图注',type:'textarea',max:60},caption2:{label:'拍立得二图注',type:'textarea',max:60},
+ productCaption:{label:'商品一图注',type:'textarea',max:90},product2Caption:{label:'商品二图注',type:'textarea',max:90},product3Caption:{label:'商品三图注 / 价格',type:'textarea',max:90},product4Caption:{label:'商品四图注 / 价格',type:'textarea',max:90},
+ detailText1:{label:'细节一（首行为标题）',type:'textarea',max:70},detailText2:{label:'细节二（首行为标题）',type:'textarea',max:70},detailText3:{label:'细节三（首行为标题）',type:'textarea',max:70},
+ footerScript:{label:'底部英文主标题',max:35},footerNote:{label:'底部中文文案',max:60},eyebrow:{label:'左下角英文',type:'textarea',max:70},swatchLabel:{label:'色卡说明',max:20},
+ collectionTitle:{label:'企划主标题',max:60},collectionSubtitle:{label:'系列副标题',max:80},tagLeft:{label:'左侧注释',max:25},tagRight:{label:'右侧注释',max:25},paperTape:{label:'胶带上的卖点',max:60},streetLabel:{label:'竖排英文标题',max:35},lookbookFooter:{label:'底部刊物说明',max:100},fontSize:{label:'主标题字号',type:'range',min:28,max:80}
+};
+const specs={
+ paper:{name:'纸感单品企划',color:'#f4f1eb',keys:['collectionTitle','collectionSubtitle','tagLeft','tagRight','paperTape','product'],assets:['product','reference'],design:[],labels:{product:'底部商品说明'},assetLabels:{product:'居中商品图'},copy:{collectionTitle:'26SS Best Awards',collectionSubtitle:'Spring / Summer Collection'}},
+ street:{name:'街拍穿搭清单',color:'#f8f7f3',keys:['brand','streetLabel','productCaption','product2Caption','product3Caption','product4Caption'],assets:['model','product','product2','product3','product4','polaroid1','reference'],design:['hero'],labels:{brand:'左上角品牌 / 标识',productCaption:'商品一 · 品牌 / 名称 / 价格',product2Caption:'商品二 · 品牌 / 名称 / 价格'},assetLabels:{model:'大幅街拍主图',polaroid1:'叠加人物图'},copy:{streetLabel:'Fashion style'}},
+ lookbook:{name:'双人 Lookbook',color:'#f5f4f0',keys:['collectionTitle','collectionSubtitle','scriptTitle','footerScript','lookbookFooter','brand','year'],assets:['model','look2','reference'],design:['hero'],labels:{collectionTitle:'顶部大标题',collectionSubtitle:'顶部系列副标题',scriptTitle:'右侧手写签名',footerScript:'底部大标题',brand:'底部品牌'},assetLabels:{model:'左侧人物',look2:'右侧人物'},copy:{collectionTitle:'Everyday Collection',collectionSubtitle:'2026 Spring / Summer Edit'}},
+ collage:{name:'AP 杂志拼贴',color:'#eee6da',keys:['masthead','year','season','scriptTitle','note','brand','product','headline','fontSize','subtitle','features','caption1','caption2','productCaption','product2Caption','detailText1','detailText2','detailText3','swatchLabel','footerScript','footerNote','eyebrow'],assets:['model','product','product2','polaroid1','polaroid2','detail1','detail2','detail3','reference'],design:['swatches','leftWidth','polaroidSize','polaroidTilt','showPolaroids','inset','hero'],labels:{headline:'右栏商品主标题',subtitle:'色带卖点',footerScript:'底部手写英文'},assetLabels:{model:'左栏人物主图'},copy:{}},
+ editorial:{name:'自然叙事',color:'#eeeade',keys:['brand','year','headline','fontSize','subtitle','features','product'],assets:['model','product','reference'],design:['hero','inset'],labels:{product:'底部商品说明'},assetLabels:{model:'封面主图'},copy:{}},
+ split:{name:'黑白刊物',color:'#f3f1ec',keys:['brand','year','headline','fontSize','subtitle','features','product'],assets:['model','product','reference'],design:['hero','inset'],labels:{product:'底部商品说明'},assetLabels:{model:'右栏主图'},copy:{}},
+ full:{name:'暖调典藏',color:'#e8d7c4',keys:['brand','year','headline','fontSize','subtitle','features','product'],assets:['model','product','reference'],design:['hero','inset'],labels:{product:'底部商品说明'},assetLabels:{model:'全幅主图'},copy:{}}
+};
+const color=v=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v);
+function spec(layout){return specs[layout]||specs.collage;}
+function safeSource(v){return typeof v==='string'&&v.length<=25*1024*1024&&(!v||/^data:image\/(png|jpeg|webp);base64,/.test(v)||/^assets\/backgrounds\/(street|indoor|outdoor)\.jpg$/.test(v))?v:'';}
+function fresh(layout,base){const s=spec(layout),values={};for(const k of s.keys)if(!common.has(k))values[k]=s.copy[k]??base[k]??'';return {values,background:{preset:'solid',color:s.color,wash:0,source:''}};}
+function sanitize(layout,record,base){const out=fresh(layout,base);if(!record||typeof record!=='object')return out;for(const k of Object.keys(out.values)){const v=record.values?.[k];if(k==='fontSize'){if(Number.isFinite(v))out.values[k]=Math.min(80,Math.max(28,v));}else if(typeof v==='string')out.values[k]=v.slice(0,fields[k]?.max||2000);}
+ const bg=record.background;if(bg&&typeof bg==='object'){out.background={preset:['custom','street','indoor','outdoor'].includes(bg.preset)?bg.preset:'solid',color:color(bg.color)?bg.color:out.background.color,wash:Number.isFinite(bg.wash)?Math.max(0,Math.min(.9,bg.wash)):0,source:safeSource(bg.source)};if(out.background.preset!=='solid'&&!out.background.source)out.background.preset='solid';}return out;}
+function capture(layout,state,source){const record={values:{},background:{preset:state.backgroundPreset,color:state.bg,wash:state.backgroundWash,source}};for(const k of spec(layout).keys)if(!common.has(k))record.values[k]=state[k];return sanitize(layout,record,state);}
+function createBank(base,state,sources,saved){const bank={};for(const layout of Object.keys(specs)){bank[layout]=fresh(layout,base);for(const k of Object.keys(bank[layout].values))if(state[k]!==undefined&&state[k]!==base[k])bank[layout].values[k]=state[k];bank[layout]=sanitize(layout,bank[layout],base);}bank[state.layout]=capture(state.layout,state,sources.background||'');for(const layout of Object.keys(specs))if(saved?.[layout])bank[layout]=sanitize(layout,saved[layout],base);return bank;}
+function prepareSwitch(state,sources,drafts,target,base){if(!specs[target])throw Error('Unknown template');const bank={...drafts,[state.layout]:capture(state.layout,state,sources.background||'')};const draft=sanitize(target,bank[target],base);bank[target]=draft;return {bank,patch:{...draft.values,layout:target,bg:draft.background.color,backgroundPreset:draft.background.preset,backgroundWash:draft.background.wash},source:draft.background.source};}
+function activeAssets(layout,state){const assets=[...spec(layout).assets];if(state.hero==='product'){const i=assets.indexOf('model');if(i>=0)assets[i]='product';}return [...new Set(assets)];}
+const api={fields,specs,spec,fresh,sanitize,capture,createBank,prepareSwitch,activeAssets,safeSource};if(typeof module==='object'&&module.exports)module.exports=api;else root.CoverTemplateModel=api;
+})(typeof window==='object'?window:this);
